@@ -15,10 +15,10 @@ void msmfsclean_kernel(double *m_model, double *residual,
 					   double *scalestack, double *smresidual,
 					   double *ssmmpsf, double *hsmmpsf, double *ihsmmpsf,
 					   double *ldirty, double *psf,
-					   const int nscales, const int nmoments,
-					   const int ny, const int nx,
+					   const long nscales, const long nmoments,
+					   const long ny, const long nx,
 					   double *windowstack,
-					   double gain, double absolutethresh, int niter,
+					   double gain, double absolutethresh, long niter,
 					   const char* findpeak = "CASA");
 
 int msmfsclean_kernel_c(PyArrayObject *&m_model_obj,
@@ -33,7 +33,7 @@ int msmfsclean_kernel_c(PyArrayObject *&m_model_obj,
                  PyArrayObject *&windowstack_obj,
                  double gain,
                  double absolutethresh,
-                 int niter,
+                 long niter,
                  const char* findpeak);
 
 #endif

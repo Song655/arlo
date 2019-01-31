@@ -16,10 +16,10 @@
 using namespace std;
 
 
-void test_cleaners(string &data_dir, int niter, double gain, double thresh,
+void test_cleaners(string &data_dir, long niter, double gain, double thresh,
                    double fracthresh, const char *findpeak,
-                   const int nscales, const int nmoments,
-                   const int nx, const int ny) {
+                   const long nscales, const long nmoments,
+                   const long nx, const long ny) {
 
 	double *m_model = new double[nmoments * ny * nx];
 	double *m_model_exact = new double[nmoments * ny * nx];
@@ -28,7 +28,8 @@ void test_cleaners(string &data_dir, int niter, double gain, double thresh,
 	double *ldirty = new double[nmoments * ny * nx];
 	double *psf = new double[2*nmoments * ny * nx];
 	double *pscalestack = new double[nscales * ny * nx];
-	double *ssmmpsf = new double[nscales * nscales * nmoments * nmoments * ny * nx];
+	long ssmm_len =  nscales * nscales * nmoments * nmoments * ny * nx;
+	double *ssmmpsf = new double[ssmm_len];
 	double *hsmmpsf = new double[nscales * nmoments * nmoments];
 	double *ihsmmpsf = new double[nscales * nmoments * nmoments];
 	double *smresidual = new double[nscales * nmoments * ny * nx];
@@ -39,13 +40,13 @@ void test_cleaners(string &data_dir, int niter, double gain, double thresh,
 	load_data(data_dir + "/" + "ldirty.dat", ldirty, nmoments * ny * nx);
 	load_data(data_dir + "/" + "psf.dat", psf, 2*nmoments * ny * nx);
 	load_data(data_dir + "/" + "pscalestack.dat", pscalestack, nscales * ny * nx);
-	load_data(data_dir + "/" + "ssmmpsf.dat", ssmmpsf, nscales * nscales * nmoments * nmoments * ny * nx);
+	load_data(data_dir + "/" + "ssmmpsf.dat", ssmmpsf, ssmm_len);
 	load_data(data_dir + "/" + "hsmmpsf.dat", hsmmpsf, nscales * nmoments * nmoments);
 	load_data(data_dir + "/" + "ihsmmpsf.dat", ihsmmpsf, nscales * nmoments * nmoments);
 	load_data(data_dir + "/" + "smresidual.dat", smresidual, nscales * nmoments * ny * nx);
 
 	double absolutethresh = 0.0;
-    for (int i = 0; i < nx * ny; i++) {
+    for (long i = 0; i < nx * ny; i++) {
         absolutethresh = max(absolutethresh, fabs(smresidual[i]));
     }
     absolutethresh = max(thresh, fracthresh * absolutethresh);
@@ -78,14 +79,14 @@ void test_cleaners(string &data_dir, int niter, double gain, double thresh,
 
 int main(int argc, char *argv[]) {
     string data_dir = "./data";
-    int niter = 0;
+    long niter = 0;
 	double gain = 0.0;
 	double thresh=0.0;
 	double fracthresh=0.0;
-	int nscales = 0;
-	int nmoments = 0;
-	int nx = 0;
-	int ny = 0;
+	long nscales = 0;
+	long nmoments = 0;
+      long nx = 0;
+      long ny = 0;
 
     int c;
     while (true) {
@@ -108,14 +109,14 @@ int main(int argc, char *argv[]) {
 
         switch (c) {
             case 1: data_dir = string(optarg); break;
-            case 2: niter = atoi(optarg); break;
+            case 2: niter = atol(optarg); break;
             case 3: gain = atof(optarg); break;
             case 4: thresh = atof(optarg); break;
             case 5: fracthresh = atof(optarg); break;
             case 6: nscales = atof(optarg); break;
-            case 7: nmoments = atof(optarg); break;
-            case 8: nx = atof(optarg); break;
-            case 9: ny = atof(optarg); break;
+            case 7: nmoments = atol(optarg); break;
+            case 8: nx = atol(optarg); break;
+            case 9: ny = atol(optarg); break;
             default: cout << "Wrong options" << endl; break;
         }
     }

@@ -32,21 +32,21 @@ void fftw_fft2(complex_t *out, complex_t *in, const int m, const int n, int back
 
         if (fftw_plans.find(shape) == fftw_plans.end()) {
 
-            complex_t *in      = (complex_t *)fftw_malloc(sizeof(*in)      * m * n);
+            complex_t *in_tmp  = (complex_t *)fftw_malloc(sizeof(*in_tmp)      * m * n);
             complex_t *out_tmp = (complex_t *)fftw_malloc(sizeof(*out_tmp) * m * n);
 
-            p = fftw_plan_dft_2d(m, n, in, out_tmp,
+            p = fftw_plan_dft_2d(m, n, (fftw_complex*)in_tmp, (fftw_complex*)out_tmp,
                                  backwards ? FFTW_BACKWARD:FFTW_FORWARD,
                                  FFTW_ESTIMATE);
 
             fftw_plans.insert(std::make_pair(shape, p));
 
-            fftw_free(in);
+            fftw_free(in_tmp);
             fftw_free(out_tmp);
         }
     }
 
-    p = fftw_plan_dft_2d(m, n, in, out,
+    p = fftw_plan_dft_2d(m, n, (fftw_complex*)in, (fftw_complex*)out,
                          backwards ? FFTW_BACKWARD:FFTW_FORWARD,
                          FFTW_ESTIMATE);
 

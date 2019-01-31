@@ -7,14 +7,14 @@ if [ $? -ne 0 ]; then
 fi
 
 DATA_DIR=./data
-NITER=100
+NITER=10
 GAIN=0.7
 THRESH=0.01
 FRACTHRESH=0.001
 NSCALES=4
 NMOMENTS=3
-NX=512
-NY=512
+NX=4096
+NY=4096
 
 if [ ! -d $DATA_DIR ]; then
     mkdir $DATA_DIR
@@ -30,6 +30,7 @@ for arg in $ARGS; do
 done
 echo "----------------"
 python test_cleaners.py $ARGS
+#sync; sudo sh -c "echo 3 > /proc/sys/vm/drop_caches"
 ./cleaners $ARGS
 rm -rf $DATA_DIR
 

@@ -14,7 +14,7 @@
 #include <algorithm>
 #include <vector>
 
-typedef double complex complex_t;
+typedef double _Complex complex_t;
 
 using namespace std;
 
@@ -54,6 +54,14 @@ void load_data(string filepath, T *arr, const int n) {
     fin.close();
 }
 
+template<typename T>
+void load_data(string filepath, T *arr, const long n) {
+    ifstream fin(filepath.c_str(), ios::binary | ios::in);
+    fin.read((char*)arr, sizeof(T) * n);
+    fin.close();    
+}
+
+
 vector<int> str2arr(string &str) {
     vector<int> arr;
     stringstream sin(str);
@@ -85,18 +93,18 @@ void print_arr(T *arr, int len) {
 
 
 template<typename T>
-double diff(T *a, T *b, int n) {
+double diff(T *a, T *b, long n) {
     double err = 0.0;
-    for (int i = 0; i < n; i++) {
+    for (long i = 0; i < n; i++) {
         err = max(err, cabs(a[i] - b[i]));
     }
     return err;
 }
 
 template<typename T>
-double diff_relative(T *a, T *b, int n) {
+double diff_relative(T *a, T *b, long n) {
     double err = 0.0, b_max = 0.0;
-    for (int i = 0; i < n; i++) {
+    for (long i = 0; i < n; i++) {
         err = max(err, cabs(a[i] - b[i]));
         b_max = max(b_max, cabs(b[i]));
     }

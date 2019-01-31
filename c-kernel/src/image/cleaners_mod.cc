@@ -23,7 +23,7 @@ static PyObject* msmfsclean_kernel_c(PyObject* self,PyObject* args) {
 
     double gain;
     double absolutethresh;
-    int niter;
+    long niter;
     char* findpeak;
 
     if (!PyArg_ParseTuple(args, "O!O!O!O!O!O!O!O!O!O!ddis", 

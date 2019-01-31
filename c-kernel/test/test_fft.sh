@@ -7,7 +7,7 @@ if [ $? -ne 0 ]; then
 fi
 
 DATA_DIR=./data
-SHAPE=7,2,1024,1024
+SHAPE=7,4,4096,4096
 
 if [ ! -d $DATA_DIR ]; then
     mkdir $DATA_DIR

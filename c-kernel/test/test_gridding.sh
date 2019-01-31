@@ -8,7 +8,7 @@ fi
 
 DATA_DIR=./data
 VSHAPE=479325,1
-GSHAPE=7,1,1024,1024
+GSHAPE=7,1,4096,4096
 KSHAPE=1,8,8,8,8
 
 if [ ! -d $DATA_DIR ]; then

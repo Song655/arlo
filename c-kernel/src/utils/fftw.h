@@ -8,7 +8,7 @@
 #include <complex.h>
 #include <fftw3.h>
 
-typedef double complex complex_t;
+typedef double _Complex complex_t;
 
 #define OPTIMIZE_FFTW 0
 

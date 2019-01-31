@@ -5,15 +5,15 @@
 
 .PHONY: clean all
 
-PYTHON_DIR=/usr/local
-INCLUDE_DIR=..
+PYTHON_DIR=/home/song/anaconda3
+INCLUDE_DIR=../../src
 SRC_DIR=../../src
 LIB_DIR=../../lib
 
 CC=g++
 
-INCLUDES=-I$(PYTHON_DIR)/include/python3.5m \
-		 -I$(PYTHON_DIR)/lib/python3.5/dist-packages/numpy/core/include/numpy \
+INCLUDES=-I$(PYTHON_DIR)/include/python3.6m \
+		 -I$(PYTHON_DIR)/lib/python3.6/site-packages/numpy/core/include/numpy \
 		 -I$(INCLUDE_DIR)/utils \
          -I$(INCLUDE_DIR)/fourier_transforms \
          -I$(INCLUDE_DIR)/imaging \
@@ -25,7 +25,7 @@ CFLAGS=-O3 -pthread -fPIC $(INCLUDES)
 
 LDFLAGS=-shared $(LIBS)
 
-LDLIBS=-lpython3.5m -lfftw3 #$(LIB_DIR)/libfftw3.a
+LDLIBS=-lpython3.6m #$(LIB_DIR)/libfftw3.a
 
 SRCS=$(SRC_DIR)/utils/fftw.cc \
 	 $(SRC_DIR)/fourier_transforms/fft_support.cc \

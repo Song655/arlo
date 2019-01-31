@@ -2,7 +2,7 @@
 # Author: You Haihang, Yang Runkai, Liu Tao,
 # Applied Computing Lab, ICT, CAS 
 
-PYTHON_DIR=/usr/local
+PYTHON_DIR=/home/song/anaconda3
 
 BLASDIR=..
 
@@ -10,8 +10,8 @@ INCLUDE_DIR=../src
 LIB_DIRS=-L../lib \
 		-L$(BLASDIR)/lib
 
-INCLUDES=-I$(PYTHON_DIR)/include/python3.5m \
-         -I$(PYTHON_DIR)/lib/python3.5/dist-packages/numpy/core/include/numpy \
+INCLUDES=-I$(PYTHON_DIR)/include/python3.6m \
+         -I$(PYTHON_DIR)/lib/python3.6/site-packages/numpy/core/include/numpy \
          -I$(INCLUDE_DIR)/utils \
          -I$(INCLUDE_DIR)/fourier_transforms \
          -I$(INCLUDE_DIR)/imaging \

@@ -8,7 +8,7 @@
 #include <complex.h>
 #include <ndarrayobject.h>
 
-typedef double complex complex_t;
+typedef double _Complex complex_t;
 
 // #include "../utils/fftw.h"
 

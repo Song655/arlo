@@ -436,20 +436,20 @@ using namespace std;
     :return: (limits in a1, limits in a2)
     """
 */    
-void overlap_indices(int *lhs, int *rhs, 
+void overlap_indices(long *lhs, long *rhs, 
                     double *res, double *psf, 
-                    int peakx, int peaky,
-                    const int *res_shape, const int *psf_shape) {
+                    long peakx, long peaky,
+                    const long *res_shape, const long *psf_shape) {
 
-    int nx = res_shape[0], ny = res_shape[1];
-    int psfwidthx = psf_shape[0] / 2, psfwidthy = psf_shape[1] / 2;
-    int psfpeakx = psf_shape[0] / 2, psfpeaky = psf_shape[1] / 2;
+    long nx = res_shape[0], ny = res_shape[1];
+    long psfwidthx = psf_shape[0] / 2, psfwidthy = psf_shape[1] / 2;
+    long psfpeakx = psf_shape[0] / 2, psfpeaky = psf_shape[1] / 2;
 
-    int res_lower[] = {max(0, peakx - psfwidthx), max(0, peaky - psfwidthy)};
-    int res_upper[] = {min(nx, peakx + psfwidthx), min(peaky + psfwidthy, ny)};
+    long res_lower[] = {max(0l, peakx - psfwidthx), max(0l, peaky - psfwidthy)};
+    long res_upper[] = {min(nx, peakx + psfwidthx), min(peaky + psfwidthy, ny)};
 
-    int psf_lower[] = {max(0, psfpeakx + (res_lower[0] - peakx)), max(0, psfpeaky + (res_lower[1] - peaky))};
-    int psf_upper[] = {min(psf_shape[0], psfpeakx + (res_upper[0] - peakx)), min(psfpeaky + (res_upper[1] - peaky), psf_shape[1])};
+    long psf_lower[] = {max(0l, psfpeakx + (res_lower[0] - peakx)), max(0l, psfpeaky + (res_lower[1] - peaky))};
+    long psf_upper[] = {min(psf_shape[0], psfpeakx + (res_upper[0] - peakx)), min(psfpeaky + (res_upper[1] - peaky), psf_shape[1])};
 
     lhs[0] = res_lower[0], lhs[1] = res_upper[0], lhs[2] = res_lower[1], lhs[3] = res_upper[1];
     rhs[0] = psf_lower[0], rhs[1] = psf_upper[0], rhs[2] = psf_lower[1], rhs[3] = psf_upper[1];
@@ -470,25 +470,26 @@ void overlap_indices(int *lhs, int *rhs,
     # smresidual: nscales, nmoments, nx, ny
 */
 void calculate_scale_moment_principal_solution(double *smpsol, double *smresidual, double *ihsmmpsf,
-                                               const int nmoments, const int nscales, 
-                                               const int nx, const int ny) {
+                                               const long nmoments, const long nscales, 
+                                               const long nx, const long ny) {
 
-    const int nz = nx * ny;
+    const long nz = nx * ny;
     memset(smpsol, 0, sizeof(double) * nscales * nmoments * nz);
 
-    // for (int s = 0; s < nscales; s++) {
-    //     for (int n = 0; n < nmoments; n++) {
-    //         for (int x = 0; x < nx; x++) {
-    //             for (int y = 0; y < ny; y++) {
- //                 for (int m = 0; m < nmoments; m++) {
-    //                     smpsol[(((s*nmoments+n)*nx+x)*ny+y)] += ihsmmpsf[((s*nmoments+m)*nmoments+n)] * 
-    //                                                             smresidual[(((s*nmoments+m)*nx+x)*ny+y)];
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+     for (long s = 0; s < nscales; s++) {
+         for (long n = 0; n < nmoments; n++) {
+             for (long x = 0; x < nx; x++) {
+                 for (long y = 0; y < ny; y++) {
+                  for (long m = 0; m < nmoments; m++) {
+                         smpsol[(((s*nmoments+n)*nx+x)*ny+y)] += ihsmmpsf[((s*nmoments+m)*nmoments+n)] * 
+                                                                 smresidual[(((s*nmoments+m)*nx+x)*ny+y)];
+                     }
+                 }
+             }
+         }
+     }
 
+/**
     #pragma omp parallel
     {
         int nthreads = omp_get_max_threads();
@@ -513,6 +514,7 @@ void calculate_scale_moment_principal_solution(double *smpsol, double *smresidua
             }
         }
     }
+	*/
 }
 
 
@@ -526,18 +528,18 @@ void calculate_scale_moment_principal_solution(double *smpsol, double *smresidua
     :return: x, y, optimum scale for peak
     """
 */    
-void find_optimum_scale_zero_moment(int &mx, int &my, int &mscale, double *smpsol, double *windowstack, 
-                                    const int nmoments, const int nscales, const int nx, const int ny) {
+void find_optimum_scale_zero_moment(long &mx, long &my, long &mscale, double *smpsol, double *windowstack, 
+                                    const long nmoments, const long nscales, const long nx, const long ny) {
 
     double optimum = 0.0;
-    int index = 0;
+    long index = 0;
 
     if (windowstack != NULL) {
-        for (int s = 0; s < nscales; s++) {
-            int begin_s = s * nmoments * nx * ny;
-            int begin_w = s * nx * ny;
+        for (long s = 0; s < nscales; s++) {
+            long begin_s = s * nmoments * nx * ny;
+            long begin_w = s * nx * ny;
 
-            for (int z = 0; z < nx * ny; z++) {
+            for (long z = 0; z < nx * ny; z++) {
                 double val = smpsol[begin_s + z] * windowstack[begin_w + z];
                 if (val > optimum) {
                     optimum = val;
@@ -547,10 +549,10 @@ void find_optimum_scale_zero_moment(int &mx, int &my, int &mscale, double *smpso
         }
     }
     else {
-        for (int s = 0; s < nscales; s++) {
-            int begin_s = s * nmoments * nx * ny;
+        for (long s = 0; s < nscales; s++) {
+            long begin_s = s * nmoments * nx * ny;
 
-            for (int z = 0; z < nx * ny; z++) {
+            for (long z = 0; z < nx * ny; z++) {
                 double val = smpsol[begin_s + z];
                 if (val > optimum) {
                     optimum = val;
@@ -574,11 +576,11 @@ void find_optimum_scale_zero_moment(int &mx, int &my, int &mscale, double *smpso
 
     """
 */    
-void find_global_optimum(int &mscale, int &mx, int &my, double *mval, 
+void find_global_optimum(long &mscale, long &mx, long &my, double *mval, 
                         double *hsmmpsf, double *ihsmmpsf, 
                         double *smresidual, double *windowstack, 
-                        const int nmoments, const int nscales, 
-                        const int nx, const int ny,
+                        const long nmoments, const long nscales, 
+                        const long nx, const long ny,
                         const char *findpeak) {
 
     double *smpsol = (double*)malloc(sizeof(double) * nscales * nmoments * nx * ny);
@@ -591,28 +593,28 @@ void find_global_optimum(int &mscale, int &mx, int &my, double *mval,
     else if (strcmp(findpeak, "CASA") == 0) {
         double *dchisq = (double*)malloc(sizeof(double) * nscales * 1 * nx * ny);
 
-        for (int scale = 0; scale < nscales; scale++) {
+        for (long scale = 0; scale < nscales; scale++) {
 
             double *dchisq_s = dchisq + scale * 1 * nx * ny;
             double *smpsol_s = smpsol + scale * nmoments * nx * ny;
             double *smresidual_s = smresidual + scale * nmoments * nx * ny;
             double *hsmmpsf_s = hsmmpsf + scale * nmoments * nmoments;
 
-            for (int monent1 = 0; monent1 < nmoments; monent1++) {
+            for (long monent1 = 0; monent1 < nmoments; monent1++) {
 
                 double *smpsol_sm = smpsol_s + monent1 * nx * ny;
                 double *smresidual_sm = smresidual_s + monent1 * nx * ny;
 
-                for (int i = 0; i < nx; i++) {
-                    for (int j = 0; j < ny; j++) {
+                for (long i = 0; i < nx; i++) {
+                    for (long j = 0; j < ny; j++) {
                         dchisq_s[i * ny + j] += 2.0 * smpsol_sm[i * ny + j] * smresidual_sm[i * ny + j];
                     }
                 }
 
-                for (int monent2 = 0; monent2 < nmoments; monent2++) {
+                for (long monent2 = 0; monent2 < nmoments; monent2++) {
 
-                    for (int i = 0; i < nx; i++) {
-                        for (int j = 0; j < ny; j++) {
+                    for (long i = 0; i < nx; i++) {
+                        for (long j = 0; j < ny; j++) {
                             dchisq_s[i * ny + j] -= hsmmpsf_s[monent1 * nmoments + monent2] * 
                                                     smpsol_sm[i * ny + j] * 
                                                     smpsol_s[(monent2 * nx + i) * ny + j];
@@ -630,8 +632,8 @@ void find_global_optimum(int &mscale, int &mx, int &my, double *mval,
     else {
         double *prod_sol_res = (double*)malloc(sizeof(double) * nscales * nmoments * nx * ny);
 
-        # pragma omp parallel for
-        for (int i = 0; i < nscales * nmoments * nx * ny; i++) {
+        # pragma omp parallel for num_threads(8)
+        for (long i = 0; i < nscales * nmoments * nx * ny; i++) {
             prod_sol_res[i] = smpsol[i] * smresidual[i];
         }
         
@@ -641,7 +643,7 @@ void find_global_optimum(int &mscale, int &mx, int &my, double *mval,
     }
 
     double *smpsol_local = smpsol + mscale * nmoments * nx * ny;
-    for (int i = 0; i < nmoments; i++) {
+    for (long i = 0; i < nmoments; i++) {
         mval[i] = smpsol_local[(i * nx + mx) * ny + my];
     }
 
@@ -657,24 +659,24 @@ void find_global_optimum(int &mscale, int &mx, int &my, double *mval,
     """
 */    
 void update_moment_model(double *m_model, double *scalestack,
-                        int* lhs, int *rhs, 
-                        double gain, int mscale, double *mval,
-                        const int nmoments, const int nscales, 
-                        const int nx, const int ny) {
+                        long* lhs, long *rhs, 
+                        double gain, long mscale, double *mval,
+                        const long nmoments, const long nscales, 
+                        const long nx, const long ny) {
 
-    int ldx = lhs[1] - lhs[0], ldy = lhs[3] - lhs[2];
-    int rdx = rhs[1] - rhs[0], rdy = rhs[3] - rhs[2];
+    long ldx = lhs[1] - lhs[0], ldy = lhs[3] - lhs[2];
+    long rdx = rhs[1] - rhs[0], rdy = rhs[3] - rhs[2];
     assert(ldx == rdx && ldy == rdy);
-    int dx = ldx, dy = ldy;
+    long dx = ldx, dy = ldy;
 
-    for (int t = 0; t < nmoments; t++) {
+    for (long t = 0; t < nmoments; t++) {
 
         double val = gain * mval[t];
         double *m_model_local = m_model + t * nx * ny ;
         double *scalestack_local = scalestack + mscale * nx * ny;
 
-        for (int i = 0; i < dx; i++) {
-            for (int j = 0; j < dy; j++) {
+        for (long i = 0; i < dx; i++) {
+            for (long j = 0; j < dy; j++) {
 
                 m_model_local[(lhs[0]+i) * ny + (lhs[2]+j)] += scalestack_local[(rhs[0]+i) * ny + (rhs[2]+j)] * val;
             
@@ -691,39 +693,40 @@ void update_moment_model(double *m_model, double *scalestack,
     """
 */    
 void update_scale_moment_residual(double *smresidual, double *ssmmpsf, 
-                                int *lhs, int *rhs, 
-                                double gain, int mscale, double *mval, 
-                                const int nmoments, const int nscales, 
-                                const int nx, const int ny) {
+                                long *lhs, long *rhs, 
+                                double gain, long mscale, double *mval, 
+                                const long nmoments, const long nscales, 
+                                const long nx, const long ny) {
 
-    int ldx = lhs[1] - lhs[0], ldy = lhs[3] - lhs[2];
-    int rdx = rhs[1] - rhs[0], rdy = rhs[3] - rhs[2];
+    long ldx = lhs[1] - lhs[0], ldy = lhs[3] - lhs[2];
+    long rdx = rhs[1] - rhs[0], rdy = rhs[3] - rhs[2];
     assert(ldx == rdx && ldy == rdy);
-    int dx = ldx, dy = ldy;
+    long dx = ldx, dy = ldy;
     
     double *ssmmpsf_0 = ssmmpsf + mscale * nscales * nmoments * nmoments * nx * ny;
 
-    // for (int mi = 0; mi < nscales; mi++) {
-    //  for (int mj = 0; mj < nmoments; mj++) {
+     for (long mi = 0; mi < nscales; mi++) {
+      for (long mj = 0; mj < nmoments; mj++) {
 
-    //      double *ssmmpsf_local = ssmmpsf_m + (mi * nmoments + mj) * nmoments * nx * ny;
-    //      double *smresidual_local = smresidual + (mi * nmoments + mj) * nx * ny;
+          double *ssmmpsf_local = ssmmpsf_0 + (mi * nmoments + mj) * nmoments * nx * ny;
+          double *smresidual_local = smresidual + (mi * nmoments + mj) * nx * ny;
 
-    //      for (int i = 0; i < dx; i++) {
-    //          for (int j = 0; j < dy; j++) {
+          for (long i = 0; i < dx; i++) {
+              for (long j = 0; j < dy; j++) {
 
-    //              double sum = 0.0;
-    //              for (int v = 0; v < nmoments; v++) {
-    //                  sum += ssmmpsf_local[(v * nx + (rhs[0]+i)) * ny + (rhs[2]+j)] * mval[v];
-    //              }
+                  double sum = 0.0;
+                  for (long v = 0; v < nmoments; v++) {
+                      sum += ssmmpsf_local[(v * nx + (rhs[0]+i)) * ny + (rhs[2]+j)] * mval[v];
+                  }
 
-    //              smresidual_local[(lhs[0]+i) * ny + (lhs[2]+j)] -= gain * sum;
+                  smresidual_local[(lhs[0]+i) * ny + (lhs[2]+j)] -= gain * sum;
 
-    //          }
-    //      }
-    //  }
-    // }
+              }
+          }
+      }
+     }
 
+    /**  
     #pragma omp parallel
     {
         int nthreads = omp_get_max_threads();
@@ -754,6 +757,8 @@ void update_scale_moment_residual(double *smresidual, double *ssmmpsf,
             }
         }
     }
+
+	*/
 }
 
 
@@ -786,10 +791,10 @@ void msmfsclean_kernel(double *m_model, double *residual,
                        double *scalestack, double *smresidual,
                        double *ssmmpsf, double *hsmmpsf, double *ihsmmpsf,
                        double *ldirty, double *psf,
-                       const int nscales, const int nmoments,
-                       const int nx, const int ny,
+                       const long nscales, const long nmoments,
+                       const long nx, const long ny,
                        double *windowstack,
-                       double gain, double absolutethresh, int niter,
+                       double gain, double absolutethresh, long niter,
                        const char *findpeak) {
 
     // m_model: nmoments, nx, ny
@@ -803,35 +808,36 @@ void msmfsclean_kernel(double *m_model, double *residual,
     // ssmmpsf: nscales, nscales, nmoments, nmoments, nx, ny
     // hsmmpsf: nscales, nmoments, nmoments
     // ihsmmpsf: nscales, nmoments, nmoments
-    const int dirty_len = nmoments * nx * ny;
-    const int psf_len = 2 * nmoments * nx * ny;
-    const int scale_len = nscales * nx * ny;
-    const int hsmm_len = nscales * nmoments * nmoments;
-    const int ssmm_len = nscales * nscales * nmoments * nmoments * nx * ny;
-    const int res_len = nscales * nmoments * nx * ny;
+    
+    //const int dirty_len = nmoments * nx * ny;
+    const long psf_len = 2 * nmoments * nx * ny;
+    //const int scale_len = nscales * nx * ny;
+    //const int hsmm_len = nscales * nmoments * nmoments;
+    //const int ssmm_len = nscales * nscales * nmoments * nmoments * nx * ny;
+    //const int res_len = nscales * nmoments * nx * ny;
 
     double pmax = psf[0];
-    for (int i = 1; i < psf_len; i++) {
+    for (long i = 1; i < psf_len; i++) {
         pmax = max(pmax, psf[i]);
     }
 
-    int mscale, mx, my;
+    long mscale, mx, my;
     double *mval = (double*)malloc(sizeof(double) * nmoments);
-    int lhs[4], rhs[4];
+    long lhs[4], rhs[4];
 
-    int ldirty0_shape[] = {nx, ny};
-    int psf0_shape[] = {nx, ny};
+    long ldirty0_shape[] = {nx, ny};
+    long psf0_shape[] = {nx, ny};
 
-    for (int i = 0; i < niter; i++) {
+    for (long i = 0; i < niter; i++) {
         find_global_optimum(mscale, mx, my, mval, 
                             hsmmpsf, ihsmmpsf, smresidual, windowstack, 
                             nmoments, nscales, nx, ny, findpeak);
 
-        double mval_max = mval[0];
-        for (int v = 1; v < nmoments; v++) {
-            mval_max = max(mval_max, mval[v]);
+        double mval_max = fabs(mval[0]);
+        for (long v = 1; v < nmoments; v++) {
+            mval_max = max(mval_max, fabs(mval[v]));
         }
-        if (fabs(mval_max) < absolutethresh) {
+        if (mval_max < absolutethresh) {
             break;
         }
 
@@ -845,8 +851,8 @@ void msmfsclean_kernel(double *m_model, double *residual,
                                      nmoments, nscales, nx, ny);
     }
 
-    # pragma omp parallel for
-    for (int i = 0; i < nmoments * nx * ny; i++) {
+    # pragma omp parallel for num_threads(8)
+    for (long i = 0; i < nmoments * nx * ny; i++) {
         residual[i] = pmax * smresidual[i];
     }
 
@@ -882,13 +888,13 @@ int msmfsclean_kernel_c(PyArrayObject *&m_model_obj,
                  PyArrayObject *&windowstack_obj,
                  double gain,
                  double absolutethresh,
-                 int niter,
+                 long niter,
                  const char* findpeak) {
 
-    int nscales = smresidual_obj->dimensions[0];
-    int nmoments = smresidual_obj->dimensions[1];
-    int ny = smresidual_obj->dimensions[2];
-    int nx = smresidual_obj->dimensions[3];
+    long nscales = smresidual_obj->dimensions[0];
+    long nmoments = smresidual_obj->dimensions[1];
+    long ny = smresidual_obj->dimensions[2];
+    long nx = smresidual_obj->dimensions[3];
 
     double *m_model = (double*)m_model_obj->data;
     double *residual = (double*)residual_obj->data;
@@ -903,7 +909,7 @@ int msmfsclean_kernel_c(PyArrayObject *&m_model_obj,
     double *windowstack;
 
     double sum = 0.0;
-    for (int i = 0; i < nscales * nx * ny; i++) {
+    for (long i = 0; i < nscales * nx * ny; i++) {
         sum += windowstack[i];
     }
     if (fabs(sum) < 1e-6) {
