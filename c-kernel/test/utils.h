@@ -46,6 +46,13 @@ void load_shape(string &filename, int *vshape, int *gshape, int *kshape) {
     load_line(line, kshape, 5);
 }
 
+template<typename T>
+void Store_data(string filepath, T *arr, const long n) {
+    ofstream fout(filepath.c_str(), ios::binary);
+    fout.write((char*)arr, sizeof(T) * n);
+    fout.close();
+}
+
 
 template<typename T>
 void load_data(string filepath, T *arr, const int n) {

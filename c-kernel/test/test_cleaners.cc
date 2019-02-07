@@ -58,6 +58,9 @@ void test_cleaners(string &data_dir, long niter, double gain, double thresh,
 	double wtime = 1.0 * (stop - start) / CLOCKS_PER_SEC;
 	printf("Optimized Time: %.2lfs\n", wtime);
 
+      //Store_data(data_dir + "/" + "m_model_c.dat",m_model, nmoments * ny * nx);
+	//Store_data(data_dir + "/" + "residual_c.dat",m_model, nmoments * ny * nx);
+      
 	double err_model = diff_relative(m_model, m_model_exact, nmoments * ny * nx);
 	double err_residual = diff(residual, residual_exact, nmoments * ny * nx);
 	cout << "Cleaners Error (m_model, relative) : " << err_model << endl;

@@ -538,27 +538,48 @@ void find_optimum_scale_zero_moment(long &mx, long &my, long &mscale, double *sm
         for (long s = 0; s < nscales; s++) {
             long begin_s = s * nmoments * nx * ny;
             long begin_w = s * nx * ny;
+	     double this_max = 0.0;
+	     double img_max = 0.0;
+	     long max_index = 0;
 
             for (long z = 0; z < nx * ny; z++) {
                 double val = smpsol[begin_s + z] * windowstack[begin_w + z];
-                if (val > optimum) {
-                    optimum = val;
-                    index = begin_s + z;
-                }
-            }
+		   double abs_val =  fabs(val);
+		   if (abs_val > this_max){
+		      this_max = abs_val;
+		   }
+		   if (val > img_max) {
+	                img_max = val;
+	                max_index = begin_s + z;
+	          }
+		}
+	      if (this_max > optimum){
+		      optimum = this_max;
+	            index = max_index;
+	      }
         }
     }
     else {
         for (long s = 0; s < nscales; s++) {
             long begin_s = s * nmoments * nx * ny;
-
+            double this_max = 0.0;
+	       double img_max = 0.0;
+	     long max_index = 0;
             for (long z = 0; z < nx * ny; z++) {
                 double val = smpsol[begin_s + z];
-                if (val > optimum) {
-                    optimum = val;
-                    index = begin_s + z;
-                }
+		   double abs_val =  fabs(val);
+		   if (abs_val > this_max){
+		      this_max = abs_val;
+		   }
+		   if (val > img_max) {
+	                img_max = val;
+	                max_index = begin_s + z;
+	          }
             }
+	     if (this_max > optimum){
+		  optimum = this_max;
+                index = max_index;
+	     }
         }
     }
 
