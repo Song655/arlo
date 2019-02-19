@@ -653,7 +653,7 @@ void find_global_optimum(long &mscale, long &mx, long &my, double *mval,
     else {
         double *prod_sol_res = (double*)malloc(sizeof(double) * nscales * nmoments * nx * ny);
 
-        # pragma omp parallel for num_threads(8)
+        //# pragma omp parallel for num_threads(8)
         for (long i = 0; i < nscales * nmoments * nx * ny; i++) {
             prod_sol_res[i] = smpsol[i] * smresidual[i];
         }
@@ -872,7 +872,7 @@ void msmfsclean_kernel(double *m_model, double *residual,
                                      nmoments, nscales, nx, ny);
     }
 
-    # pragma omp parallel for num_threads(8)
+    //# pragma omp parallel for num_threads(8)
     for (long i = 0; i < nmoments * nx * ny; i++) {
         residual[i] = pmax * smresidual[i];
     }

@@ -131,7 +131,7 @@ void convolutional_degrid(complex_t *vis, const int *vshape,
 	// 	}
 	// }
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int ps = 0; ps < vnpol * nvis; ps++) {
 		int pol = ps / nvis;
 		int s = ps % nvis;
